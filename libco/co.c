@@ -267,7 +267,7 @@ void co_yield() {
     /// Context has not set yet. Jump directly.
     case CO_NEW:
     {
-      exec_co->status = CO_RUNNABLE;
+      ((struct co volatile *)exec_co)->status = CO_RUNNABLE;
       stack_switch_call(exec_co->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
 
       /// When coroutine returns, %rip goes here.
