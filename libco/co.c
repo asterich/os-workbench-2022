@@ -196,10 +196,11 @@ void co_wait(struct co *co) {
   }
 
   /// It's dead, free it.
-  co_free(co);
+  // co_free(co);
 
   /// Reap coroutine "main".
   if (list_len(&coroutine_list) == 1) {
+    printf("curr_co\'s name is: %s\n", curr_co->name);
     struct co *main_co = list_entry(coroutine_list.next, struct co, co_list);
     printf("main_co\'s name is: %s\n", main_co->name);
     assert(curr_co == main_co);
