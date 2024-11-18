@@ -100,33 +100,38 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
-    "push %%rcx;"
-    "push %%rsi;"
-    "movq %%rsp, %%rcx;"
+    "movq %%rcx, 0($0);"
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
-    "sub  $0x8, %%rsp;"
-    "push %%rcx;"
     "call *%1\n\t"
-"ret_place:"
     "pop %%rsp;"
     "pop %%rsi;"
     "pop %%rcx"
       :
       : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
-      : "memory", "rcx"
+      : "memory"
 #else
-    "movl %%esp, %%ecx;"
+    "movl %%ecx, 4(%0);"
     "movl %0, %%esp;"
-    "push %%ecx;"
     "movl %2, %%ecx;"
-    "push %%ecx;"
     "call *%1;"
-    "pop %%ecx;"
-    "pop %%esp"
       :
       : "b"((uintptr_t)sp - 8), "d"(entry), "a"(arg)
       : "memory", "ecx"
+#endif
+  );
+}
+
+static inline void restore_return() {
+  asm volatile(
+#if __x86_64__
+    "movq 0(%%rsp), %%rcx"
+    :
+    :
+#else
+    "movl 4(%%esp), %%ecx"
+    :
+    :
 #endif
   );
 }
@@ -259,10 +264,6 @@ void co_yield() {
     }
   }
 
-  if (!least_called_co) {
-    least_called_co = curr_co;
-  }
-
   exec_co = least_called_co;
 
   // printf("switching to coroutine %s\n", exec_co->name);
@@ -277,15 +278,13 @@ void co_yield() {
     {
       ((struct co volatile *)exec_co)->status = CO_RUNNABLE;
       stack_switch_call(((struct co *)exec_co)->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
+      restore_return();
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
       // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
-      curr_co = exec_co->waiter;
-      assert(curr_co != NULL);
-      // co_yield();
-      longjmp(exec_co->waiter->context, 1);
+      co_yield();
     }
     break;
 
