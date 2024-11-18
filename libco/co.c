@@ -195,8 +195,6 @@ void co_wait(struct co *co) {
     co_yield();
   }
 
-  assert(curr_co == co);
-
   /// It's dead, free it.
   co_free(co);
 
@@ -252,6 +250,7 @@ void co_yield() {
       /// Set status to CO_DEAD.
       printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
+      co_yield();
     }
     break;
 
