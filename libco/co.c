@@ -195,7 +195,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
-  printf("co_wait, curr_co is %s at %p\n", curr_co->name, curr_co);
+  // printf("co_wait, curr_co is %s at %p\n", curr_co->name, curr_co);
 
   /// Set the status of current coroutine to CO_WAITING.
   curr_co->status = CO_WAITING;
@@ -275,7 +275,7 @@ void co_yield() {
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
-      printf("coroutine %s is dead.\n", exec_co->name);
+      // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
       curr_co = exec_co->waiter;
       // co_yield();
