@@ -239,7 +239,7 @@ void co_yield() {
   struct co *least_called_co = NULL;
   size_t least_called_val = SIZE_MAX;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
-    printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
+    // printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
     if (exec_co == curr_co) {
       continue;
     }
@@ -257,7 +257,7 @@ void co_yield() {
 
   exec_co = least_called_co;
 
-  printf("switching to coroutine %s\n", exec_co->name);
+  // printf("switching to coroutine %s\n", exec_co->name);
 
   struct co *old_co = curr_co;
   curr_co = exec_co;
@@ -272,7 +272,7 @@ void co_yield() {
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
-      printf("coroutine %s is dead.\n", exec_co->name);
+      // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
       curr_co = exec_co->waiter;
       longjmp(exec_co->waiter->context, 1);
