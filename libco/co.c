@@ -202,11 +202,11 @@ void co_wait(struct co *co) {
 
   /// Reap coroutine "main".
   if (list_len(&coroutine_list) == 1) {
-    printf("curr_co\'s name is: %s\n", curr_co->name);
+    // printf("curr_co\'s name is: %s\n", curr_co->name);
     struct co *main_co = list_entry(coroutine_list.next, struct co, co_list);
-    printf("main_co\'s name is: %s\n", main_co->name);
+    // printf("main_co\'s name is: %s\n", main_co->name);
     assert(curr_co == main_co);
-    if (!strcmp(main_co->name, "main")) {
+    if (!strncmp(main_co->name, "main", 5)) {
       co_free(main_co);
     } else {
       perror("The coroutine freeing in the end is not main coroutine");
@@ -227,7 +227,7 @@ void co_yield() {
   /// You can find at least one coroutine.
   struct co *exec_co = NULL;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
-    // printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
+    printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
     if (exec_co == curr_co) {
       continue;
     }
@@ -237,6 +237,8 @@ void co_yield() {
       break;
     }
   }
+
+  printf("switching to coroutine %s\n", exec_co->name);
 
   struct co *old_co = curr_co;
   curr_co = exec_co;
