@@ -201,6 +201,7 @@ void co_wait(struct co *co) {
   /// Reap coroutine "main".
   if (list_len(&coroutine_list) == 1) {
     struct co *main_co = list_entry(coroutine_list.next, struct co, co_list);
+    printf("main_co\'s name is: %s\n", main_co->name);
     assert(curr_co == main_co);
     if (!strcmp(main_co->name, "main")) {
       co_free(main_co);
