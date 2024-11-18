@@ -109,6 +109,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "push %%rcx;"
     "call *%1;"
     "pop %%rsp;"
+    "add  $0x8, %%rsp;"
     "pop %%rsi;"
     "pop %%rcx"
       :
