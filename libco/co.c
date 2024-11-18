@@ -288,7 +288,7 @@ void co_yield() {
     case CO_RUNNABLE:
     case CO_WAITING:
     {
-      longjmp(exec_co->context, 1);
+      longjmp(((struct co *)exec_co)->context, 1);
     }
     break;
 
