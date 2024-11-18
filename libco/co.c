@@ -137,6 +137,7 @@ struct co {
   void (*func)(void *); // co_start 指定的入口地址和参数
   void *arg;
 
+  size_t call_cnt;
   enum co_status status;  // 协程的状态
   struct co *    waiter;  // 是否有其他协程在等待当前协程
   jmp_buf        context; // 寄存器现场 (setjmp.h)
@@ -224,36 +225,34 @@ void co_yield() {
   }
 
   /// Find a coroutine to run.
-  /// Find those at status CO_RUNNABLE or CO_NEW first.
+  /// Choose one with least called_cnt.
   struct co *exec_co = NULL;
+  struct co *least_called_co = NULL;
+  size_t least_called_val = SIZE_MAX;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
     printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
     if (exec_co == curr_co) {
       continue;
     }
     if (exec_co->status == CO_NEW
-        || exec_co->status == CO_RUNNABLE) {
-      break;
+        || exec_co->status == CO_RUNNABLE
+        || exec_co->status == CO_WAITING) {
+      if (least_called_val > exec_co->call_cnt) {
+        least_called_val = exec_co->call_cnt;
+        least_called_co = exec_co;
+      }
     }
   }
 
-  /// If not found, find those at CO_WAITING.
-  if (&exec_co->co_list == &coroutine_list) {
-    list_for_each_entry(exec_co, &coroutine_list, co_list) {
-      printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
-      if (exec_co == curr_co) {
-        continue;
-      }
-      if (exec_co->status == CO_WAITING) {
-        break;
-      }
-    }
-  }
+  assert(&least_called_co->co_list != &coroutine_list);
+
+  exec_co = least_called_co;
 
   printf("switching to coroutine %s\n", exec_co->name);
 
   struct co *old_co = curr_co;
   curr_co = exec_co;
+  exec_co->call_cnt++;
   switch (exec_co->status) {
     /// CO_NEW
     /// Context has not set yet. Jump directly.
