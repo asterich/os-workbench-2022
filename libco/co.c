@@ -103,6 +103,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "movq %%rsp, %%rcx;"
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
+    "sub  $0x8, %%rsp;"
     "push %%rcx;"
     "call *%1;"
     "pop %%rsp"
