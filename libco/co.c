@@ -213,7 +213,7 @@ void co_wait(struct co *co) {
     co_yield();
   }
 
-  printf("co_wait, curr_co is %s at %p, freeing co %s at %p\n", curr_co->name, curr_co, co->name, co);
+  // printf("co_wait, curr_co is %s at %p, freeing co %s at %p\n", curr_co->name, curr_co, co->name, co);
 
   /// It's dead, free it.
   co_free(co);
