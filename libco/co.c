@@ -196,7 +196,7 @@ void co_wait(struct co *co) {
   }
 
   /// It's dead, free it.
-  // co_free(co);
+  co_free(co);
 
   /// Reap coroutine "main".
   if (list_len(&coroutine_list) == 1) {
