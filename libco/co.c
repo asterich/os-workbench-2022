@@ -101,7 +101,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
     "push %%rcx;"
-    "push %%rdi;"
+    "push %%rsi;"
     "movq %%rsp, %%rcx;"
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
@@ -109,7 +109,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "push %%rcx;"
     "call *%1;"
     "pop %%rsp;"
-    "pop %%rdi;"
+    "pop %%rsi;"
     "pop %%rcx"
       :
       : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
