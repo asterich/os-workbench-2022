@@ -104,9 +104,6 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
     "call *%1\n\t"
-    "pop %%rsp;"
-    "pop %%rsi;"
-    "pop %%rcx"
       :
       : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
       : "memory"
