@@ -108,7 +108,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "call *%1;"
     "pop %%rsp"
       :
-      : "b"((uintptr_t)sp), "d"(entry), "a"(arg)
+      : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
       : "memory", "rcx"
 #else
     "movl %%esp, %%ecx;"
@@ -266,7 +266,7 @@ void co_yield() {
     case CO_NEW:
     {
       exec_co->status = CO_RUNNABLE;
-      stack_switch_call(exec_co->stack + STACK_SIZE - 0x10, exec_co->func, (uintptr_t)exec_co->arg);
+      stack_switch_call(exec_co->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
