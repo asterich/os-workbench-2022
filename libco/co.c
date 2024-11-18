@@ -258,7 +258,7 @@ void co_yield() {
     }
   }
 
-  if (&exec_co->co_list == &coroutine_list) {
+  if (!least_called_co) {
     least_called_co = curr_co;
   }
 
