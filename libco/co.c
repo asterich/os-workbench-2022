@@ -195,6 +195,8 @@ void co_wait(struct co *co) {
     co_yield();
   }
 
+  assert(curr_co == co);
+
   /// It's dead, free it.
   co_free(co);
 
