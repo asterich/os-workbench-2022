@@ -237,8 +237,8 @@ void co_yield() {
 
   /// Find a coroutine to run.
   /// Choose one with least called_cnt.
-  struct co *exec_co = NULL;
-  struct co *least_called_co = NULL;
+  struct co volatile *exec_co = NULL;
+  struct co volatile *least_called_co = NULL;
   size_t least_called_val = SIZE_MAX;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
     // printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
@@ -260,10 +260,10 @@ void co_yield() {
 
   exec_co = least_called_co;
 
-  printf("switching to coroutine %s\n", exec_co->name);
+  // printf("switching to coroutine %s\n", exec_co->name);
 
   struct co *old_co = curr_co;
-  curr_co = exec_co;
+  curr_co = (struct co *)exec_co;
   exec_co->call_cnt++;
   switch (exec_co->status) {
     /// CO_NEW
@@ -271,7 +271,7 @@ void co_yield() {
     case CO_NEW:
     {
       ((struct co volatile *)exec_co)->status = CO_RUNNABLE;
-      stack_switch_call(exec_co->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
+      stack_switch_call(((struct co *)exec_co)->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
