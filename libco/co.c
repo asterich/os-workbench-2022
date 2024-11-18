@@ -150,6 +150,9 @@ void co_free(struct co *co) {
 
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
   if (!curr_co) {
+    /// Initialize coroutine_list.
+    list_init(&coroutine_list);
+
     /// main() not initialized to a coroutine yet.
     curr_co = co_alloc("main", NULL, NULL);
     setjmp(curr_co->context);
