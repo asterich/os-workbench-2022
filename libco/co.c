@@ -258,7 +258,7 @@ void co_yield() {
     }
   }
 
-  if (&least_called_co->co_list == &coroutine_list) {
+  if (&exec_co->co_list == &coroutine_list) {
     least_called_co = curr_co;
   }
 
@@ -281,9 +281,9 @@ void co_yield() {
       /// Set status to CO_DEAD.
       // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
-      curr_co = exec_co->waiter;
-      // co_yield();
-      longjmp(curr_co->context, 1);
+      // curr_co = exec_co->waiter;
+      co_yield();
+      // longjmp(curr_co->context, 1);
     }
     break;
 
