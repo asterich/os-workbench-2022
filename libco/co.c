@@ -127,7 +127,7 @@ struct co {
   uint8_t        stack[STACK_SIZE]; // 协程的堆栈
 
   list_head_t co_list; 
-};
+} __attribute__((aligned(16)));
 
 list_head_t coroutine_list;
 int initialized = 0;
@@ -139,6 +139,7 @@ struct co *co_alloc(const char *name, void (*func)(void *), void *arg) {
   list_append_tail(&coroutine_list, &new_co->co_list);
   new_co->status = CO_NEW;
   new_co->waiter = NULL;
+  strcpy(new_co->name, name);
   new_co->func = func;
   new_co->arg = arg;
   return new_co;
@@ -223,6 +224,7 @@ void co_yield() {
     /// Context has not set yet. Jump directly.
     case CO_NEW:
     {
+      exec_co->status = CO_RUNNABLE;
       stack_switch_call(exec_co->stack, exec_co->func, (uintptr_t)exec_co->arg);
 
       /// When coroutine returns, %rip goes here.
