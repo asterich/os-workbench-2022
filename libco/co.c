@@ -174,7 +174,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 
     /// main() not initialized to a coroutine yet.
     curr_co = co_alloc("main", NULL, NULL);
-    setjmp(curr_co->context);
+    // setjmp(curr_co->context);
     curr_co->status = CO_RUNNABLE; /// set it to avoid CO_NEW
   }
 
