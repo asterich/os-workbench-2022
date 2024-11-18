@@ -224,7 +224,7 @@ void co_yield() {
   }
 
   /// Find a coroutine to run.
-  /// You can find at least one coroutine.
+  /// Find those at status CO_RUNNABLE or CO_NEW first.
   struct co *exec_co = NULL;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
     printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
@@ -232,9 +232,21 @@ void co_yield() {
       continue;
     }
     if (exec_co->status == CO_NEW
-        || exec_co->status == CO_RUNNABLE
-        || exec_co->status == CO_WAITING) {
+        || exec_co->status == CO_RUNNABLE) {
       break;
+    }
+  }
+
+  /// If not found, find those at CO_WAITING.
+  if (&exec_co->co_list == &coroutine_list) {
+    list_for_each_entry(exec_co, &coroutine_list, co_list) {
+      printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
+      if (exec_co == curr_co) {
+        continue;
+      }
+      if (exec_co->status == CO_WAITING) {
+        break;
+      }
     }
   }
 
