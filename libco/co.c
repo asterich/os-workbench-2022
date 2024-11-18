@@ -183,7 +183,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
-  printf("co_wait, curr_co is %s at %p\n", curr_co->name, curr_co);
+  // printf("co_wait, curr_co is %s at %p\n", curr_co->name, curr_co);
 
   /// Set the status of current coroutine to CO_WAITING.
   curr_co->status = CO_WAITING;
@@ -227,7 +227,7 @@ void co_yield() {
   /// You can find at least one coroutine.
   struct co *exec_co = NULL;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
-    printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
+    // printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
     if (exec_co == curr_co) {
       continue;
     }
