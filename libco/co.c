@@ -139,6 +139,8 @@ struct co *co_alloc(const char *name, void (*func)(void *), void *arg) {
   list_append_tail(&coroutine_list, &new_co->co_list);
   new_co->status = CO_NEW;
   new_co->waiter = NULL;
+  new_co->func = func;
+  new_co->arg = arg;
   return new_co;
 }
 
