@@ -183,6 +183,8 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
+  printf("co_wait, curr_co is %s at %p\n", curr_co->name, curr_co);
+
   /// Set the status of current coroutine to CO_WAITING.
   curr_co->status = CO_WAITING;
 
