@@ -242,7 +242,7 @@ void co_yield() {
     case CO_NEW:
     {
       exec_co->status = CO_RUNNABLE;
-      stack_switch_call(exec_co->stack, exec_co->func, (uintptr_t)exec_co->arg);
+      stack_switch_call(exec_co->stack + STACK_SIZE - 0x10, exec_co->func, (uintptr_t)exec_co->arg);
 
       /// When coroutine returns, %rip goes here.
       /// Set status to CO_DEAD.
