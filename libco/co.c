@@ -255,7 +255,7 @@ void co_yield() {
     }
   }
 
-  assert(least_called_co != NULL);
+  printf("%p\n", least_called_co);
   assert(&least_called_co->co_list != &coroutine_list);
 
   exec_co = least_called_co;
