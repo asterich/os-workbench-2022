@@ -107,9 +107,9 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "movq %2, %%rdi;"
     "sub  $0x8, %%rsp;"
     "push %%rcx;"
-    "call *%1;"
+    "call *%1\n\t"
+"ret_place:"
     "pop %%rsp;"
-    "add  $0x8, %%rsp;"
     "pop %%rsi;"
     "pop %%rcx"
       :
