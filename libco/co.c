@@ -258,7 +258,9 @@ void co_yield() {
     }
   }
 
-  assert(&least_called_co->co_list != &coroutine_list);
+  if (&least_called_co->co_list == &coroutine_list) {
+    least_called_co = curr_co;
+  }
 
   exec_co = least_called_co;
 
