@@ -282,6 +282,7 @@ void co_yield() {
       // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
       curr_co = exec_co->waiter;
+      assert(curr_co != NULL);
       // co_yield();
       longjmp(exec_co->waiter->context, 1);
     }
