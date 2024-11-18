@@ -113,9 +113,11 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
 #else
     "movl %%esp, %%ecx;"
     "movl %0, %%esp;"
-    "movl %2, 4(%0);"
+    "push %%ecx;"
+    "movl %2, %%ecx;"
     "push %%ecx;"
     "call *%1;"
+    "pop %%ecx;"
     "pop %%esp"
       :
       : "b"((uintptr_t)sp - 8), "d"(entry), "a"(arg)
