@@ -256,10 +256,6 @@ void co_yield() {
     }
   }
 
-  if (!least_called_co) {
-    perror("fuckyou!");
-    exit(EXIT_FAILURE);
-  }
   assert(&least_called_co->co_list != &coroutine_list);
 
   exec_co = least_called_co;
