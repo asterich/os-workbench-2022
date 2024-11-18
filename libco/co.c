@@ -134,8 +134,8 @@ int initialized = 0;
 struct co *curr_co = NULL;
 
 struct co *co_alloc(const char *name, void (*func)(void *), void *arg) {
-  struct co *new_co = (struct co *)calloc(sizeof(struct co), 0);
-  new_co->name = (char *)calloc(strlen(name) + 1, 0);
+  struct co *new_co = (struct co *)calloc(1, sizeof(struct co));
+  new_co->name = (char *)calloc(strlen(name) + 1, sizeof(char));
   list_append_tail(&coroutine_list, &new_co->co_list);
   new_co->status = CO_NEW;
   new_co->waiter = NULL;
