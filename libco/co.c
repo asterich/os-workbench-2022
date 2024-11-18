@@ -100,7 +100,7 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
-    "movq %%rcx, 0($0);"
+    "movq %%rcx, 0(%0);"
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
     "call *%1\n\t"
