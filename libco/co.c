@@ -124,6 +124,14 @@ enum co_status {
   CO_DEAD,      // 已经结束，但还未释放资源
 };
 
+const char *status_map[] = {
+  "empty",
+  "new",
+  "runnable",
+  "waiting",
+  "dead",
+};
+
 struct co {
   char *name;
   void (*func)(void *); // co_start 指定的入口地址和参数
@@ -215,6 +223,7 @@ void co_yield() {
   /// You can find at least one coroutine.
   struct co *exec_co = NULL;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
+    printf("%s is at status: %s\n", exec_co->name, status_map[exec_co->status]);
     if (exec_co == curr_co) {
       continue;
     }
