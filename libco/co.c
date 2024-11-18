@@ -100,13 +100,15 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
+    "push %%rcx;"
     "movq %%rsp, %%rcx;"
     "movq %0, %%rsp;"
     "movq %2, %%rdi;"
     "sub  $0x8, %%rsp;"
     "push %%rcx;"
     "call *%1;"
-    "pop %%rsp"
+    "pop %%rsp;"
+    "pop %%rcx"
       :
       : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
       : "memory", "rcx"
@@ -275,7 +277,7 @@ void co_yield() {
       // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
       curr_co = exec_co->waiter;
-      // longjmp(exec_co->waiter->context, 1);
+      co_yield();
     }
     break;
 
