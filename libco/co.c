@@ -259,8 +259,6 @@ void co_yield() {
 
   exec_co = least_called_co;
 
-  // printf("switching to coroutine %s\n", exec_co->name);
-
   struct co *old_co = curr_co;
   curr_co = (struct co *)exec_co;
   exec_co->call_cnt++;
@@ -276,9 +274,10 @@ void co_yield() {
     /// When coroutine returns, %rip goes here.
     /// Set status to CO_DEAD.
     exec_co->status = CO_DEAD;
+
+    /// Jump to the waiter.
     curr_co = exec_co->waiter;
     longjmp(exec_co->waiter->context, 1);
-    // co_yield();
   } break;
 
   /// CO_RUNNABLE and CO_WAITING
