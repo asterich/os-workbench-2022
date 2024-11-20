@@ -101,7 +101,7 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
       n = list_next_entry(pos, member);                                        \
        &pos->member != (head); pos = n, n = list_next_entry(n, member))
 
-// TODO: 呃呃，为什么是rcx
+/// Save the current context to the coroutine's stack and call it.
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile(
 #if __x86_64__
@@ -133,6 +133,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   );
 }
 
+/// Recover context from the coroutine's stack.
 static inline void restore_return() {
   asm volatile(
 #if __x86_64__
@@ -183,7 +184,7 @@ struct co {
 
 list_head_t coroutine_list;
 int initialized = 0;
-struct co *curr_co = NULL;
+struct co volatile *curr_co = NULL;
 
 struct co *co_alloc(const char *name, void (*func)(void *), void *arg) {
   struct co *new_co = (struct co *)calloc(1, sizeof(struct co));
@@ -214,7 +215,7 @@ void co_wait(struct co *co) {
   curr_co->status = CO_WAITING;
 
   /// Set the waiter.
-  co->waiter = curr_co;
+  co->waiter = (struct co *)curr_co;
 
   /// When the coroutine we're waiting for is not dead,
   /// switch to another coroutine.
@@ -230,7 +231,7 @@ void co_yield() {
   /// If setjmp's return value is not 0,
   /// it must be another coroutine yielding.
   /// Ignore it.
-  if (setjmp(curr_co->context) > 0) {
+  if (setjmp(((struct co *)curr_co)->context) > 0) {
     return;
   }
 
@@ -256,7 +257,6 @@ void co_yield() {
 
   // printf("switching to coroutine %s\n", exec_co->name);
 
-  struct co *old_co = curr_co;
   curr_co = (struct co *)exec_co;
   exec_co->call_cnt++;
   switch (exec_co->status) {
@@ -272,7 +272,7 @@ void co_yield() {
     /// Set status to CO_DEAD.
     exec_co->status = CO_DEAD;
     curr_co = exec_co->waiter;
-    longjmp(curr_co->context, 1);
+    longjmp(((struct co *)curr_co)->context, 1);
     // co_yield();
   } break;
 
@@ -306,4 +306,5 @@ __attribute__((destructor)) void co_free_main() {
   list_for_each_entry_safe(co, co_next, &coroutine_list, co_list) {
     co_free(co);
   }
+  curr_co = NULL;
 }
