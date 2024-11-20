@@ -154,7 +154,7 @@ static inline void restore_return() {
       "pop %%eax;"
       "pop %%ecx;"
       "pop %%edx;"
-      "pop %%rsp;"
+      "pop %%esp;"
       :
       :
 #endif
