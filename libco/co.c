@@ -226,7 +226,7 @@ void co_wait(struct co *co) {
   co_free(co);
 }
 
-void co_yield () {
+void co_yield() {
   /// If setjmp's return value is not 0,
   /// it must be another coroutine yielding.
   /// Ignore it.
@@ -271,9 +271,9 @@ void co_yield () {
     /// When coroutine returns, %rip goes here.
     /// Set status to CO_DEAD.
     exec_co->status = CO_DEAD;
-    // curr_co = exec_co->waiter;
-    // longjmp(curr_co->context, 1);
-    co_yield ();
+    curr_co = exec_co->waiter;
+    longjmp(curr_co->context, 1);
+    // co_yield();
   } break;
 
   /// CO_RUNNABLE and CO_WAITING
