@@ -220,7 +220,7 @@ void co_wait(struct co *co) {
   /// When the coroutine we're waiting for is not dead,
   /// switch to another coroutine.
   while (co->status != CO_DEAD) {
-    co_yield ();
+    co_yield();
   }
 
   /// It's dead, free it.
