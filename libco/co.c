@@ -109,6 +109,8 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     "push %%rdx;"
     "push %%rsi;"
     "push %%rdi;"
+    "push %%rax;"
+    "subq $8, %%rsp;"
     "movq %2, %%rdi;"
     "call *%1\n\t"
       :
@@ -129,6 +131,8 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
 static inline void restore_return() {
   asm volatile(
 #if __x86_64__
+    "addq $8, %%rsp;"
+    "pop %%rax;"
     "pop %%rdi;"
     "pop %%rsi;"
     "pop %%rdx;"
