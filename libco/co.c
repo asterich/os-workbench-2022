@@ -97,6 +97,8 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
          &pos->member != (head); \
          pos = list_next_entry(pos, member))
 
+
+// TODO: 呃呃，为什么是rcx
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
@@ -213,8 +215,6 @@ void co_wait(struct co *co) {
     co_yield();
   }
 
-  // printf("co_wait, curr_co is %s at %p, freeing co %s at %p\n", curr_co->name, curr_co, co->name, co);
-
   /// It's dead, free it.
   co_free(co);
 
@@ -281,7 +281,9 @@ void co_yield() {
       /// Set status to CO_DEAD.
       // printf("coroutine %s is dead.\n", exec_co->name);
       exec_co->status = CO_DEAD;
-      co_yield();
+      curr_co = exec_co->waiter;
+      longjmp(curr_co->context, 1);
+      // co_yield();
     }
     break;
 
