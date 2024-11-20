@@ -243,8 +243,8 @@ void co_yield() {
 
   /// Find a coroutine to run.
   /// Choose one with least called_cnt.
-  struct co volatile *exec_co = NULL;
-  struct co volatile *least_called_co = NULL;
+  struct co *exec_co = NULL;
+  struct co *least_called_co = NULL;
   size_t least_called_val = SIZE_MAX;
   list_for_each_entry(exec_co, &coroutine_list, co_list) {
     // printf("%s at %p is at status: %s\n", exec_co->name, exec_co, status_map[exec_co->status]);
@@ -273,8 +273,8 @@ void co_yield() {
     /// Context has not set yet. Jump directly.
     case CO_NEW:
     {
-      ((struct co volatile *)exec_co)->status = CO_RUNNABLE;
-      stack_switch_call(((struct co *)exec_co)->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
+      exec_co->status = CO_RUNNABLE;
+      stack_switch_call(exec_co->stack + STACK_SIZE, exec_co->func, (uintptr_t)exec_co->arg);
       restore_return();
 
       /// When coroutine returns, %rip goes here.
@@ -292,7 +292,7 @@ void co_yield() {
     case CO_RUNNABLE:
     case CO_WAITING:
     {
-      longjmp(((struct co *)exec_co)->context, 1);
+      longjmp(exec_co->context, 1);
     }
     break;
 
