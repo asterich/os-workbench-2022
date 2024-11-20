@@ -148,6 +148,7 @@ static inline void restore_return() {
       :
       :
 #else
+      "addl $4, %%esp;"
       "pop %%eax;"
       "pop %%ecx;"
       "pop %%edx;"
