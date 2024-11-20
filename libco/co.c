@@ -184,7 +184,7 @@ struct co {
 
 list_head_t coroutine_list;
 int initialized = 0;
-struct co volatile *curr_co = NULL;
+struct co *curr_co = NULL;
 
 struct co *co_alloc(const char *name, void (*func)(void *), void *arg) {
   struct co *new_co = (struct co *)calloc(1, sizeof(struct co));
@@ -215,7 +215,7 @@ void co_wait(struct co *co) {
   curr_co->status = CO_WAITING;
 
   /// Set the waiter.
-  co->waiter = (struct co *)curr_co;
+  co->waiter = curr_co;
 
   /// When the coroutine we're waiting for is not dead,
   /// switch to another coroutine.
@@ -231,7 +231,7 @@ void co_yield() {
   /// If setjmp's return value is not 0,
   /// it must be another coroutine yielding.
   /// Ignore it.
-  if (setjmp(((struct co *)curr_co)->context) > 0) {
+  if (setjmp(curr_co->context) > 0) {
     return;
   }
 
@@ -257,6 +257,7 @@ void co_yield() {
 
   // printf("switching to coroutine %s\n", exec_co->name);
 
+  struct co *old_co = curr_co;
   curr_co = (struct co *)exec_co;
   exec_co->call_cnt++;
   switch (exec_co->status) {
@@ -272,7 +273,7 @@ void co_yield() {
     /// Set status to CO_DEAD.
     exec_co->status = CO_DEAD;
     curr_co = exec_co->waiter;
-    longjmp(((struct co *)curr_co)->context, 1);
+    longjmp(curr_co->context, 1);
     // co_yield();
   } break;
 
@@ -306,5 +307,4 @@ __attribute__((destructor)) void co_free_main() {
   list_for_each_entry_safe(co, co_next, &coroutine_list, co_list) {
     co_free(co);
   }
-  curr_co = NULL;
 }
