@@ -102,12 +102,17 @@ void list_remove(list_head_t *head, list_head_t *delnode) {
 static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
   asm volatile (
 #if __x86_64__
-    "movq %%rcx, 0(%0);"
     "movq %0, %%rsp;"
+    "push %%r9;"
+    "push %%r8;"
+    "push %%rcx;"
+    "push %%rdx;"
+    "push %%rsi;"
+    "push %%rdi;"
     "movq %2, %%rdi;"
     "call *%1\n\t"
       :
-      : "b"((uintptr_t)sp - 16), "d"(entry), "a"(arg)
+      : "b"((uintptr_t)sp), "d"(entry), "a"(arg)
       : "memory"
 #else
     "movl %%ecx, 4(%0);"
@@ -124,7 +129,12 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
 static inline void restore_return() {
   asm volatile(
 #if __x86_64__
-    "movq 0(%%rsp), %%rcx"
+    "pop %%rdi;"
+    "pop %%rsi;"
+    "pop %%rdx;"
+    "pop %%rcx;"
+    "pop %%r8;"
+    "pop %%r9;"
     :
     :
 #else
