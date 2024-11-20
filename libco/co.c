@@ -128,7 +128,7 @@ static inline void stack_switch_call(void *sp, void *entry, uintptr_t arg) {
       "call *%1;"
       :
       : "b"((uintptr_t)sp), "d"(entry), "a"(arg)
-      : "memory", "ecx"
+      : "memory"
 #endif
   );
 }
@@ -223,6 +223,10 @@ void co_wait(struct co *co) {
     co_yield();
   }
 
+  /// 
+  curr_co = co->waiter;
+  curr_co->status = CO_RUNNABLE;
+
   /// It's dead, free it.
   co_free(co);
 }
@@ -272,8 +276,8 @@ void co_yield() {
     /// When coroutine returns, %rip goes here.
     /// Set status to CO_DEAD.
     exec_co->status = CO_DEAD;
-    curr_co = exec_co->waiter;
-    longjmp(curr_co->context, 1);
+    // curr_co = exec_co->waiter;
+    longjmp(exec_co->waiter->context, 1);
     // co_yield();
   } break;
 
